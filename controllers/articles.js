@@ -2,39 +2,42 @@ const Article = require('../models/article');
 const {
   badRequestError,
   notFoundError,
+  conflictError,
 } = require('../errors/errors');
 
 const getArticles = async (req, res, next) => {
   try {
-    const articles = await Article.find({})
-      .map((i) => toString(i.owner) === toString(req.user._id));
+    const articles = await Article
+      .find({ owner: req.user._id });
 
-    return res.send(articles);
+    res.status(200).send(articles);
   } catch (error) {
-    console.log(error);
-    return next(error);
+    next(error);
   }
 };
 
 const createArticle = async (req, res, next) => {
   try {
-    const article = await Article.create({
-      keyword: req.body.keyword,
-      title: req.body.title,
-      text: req.body.text,
-      date: Date.now(),
-      source: req.body.source,
-      link: req.body.link,
-      image: req.body.image,
-    });
+    const article = await Article
+      .create({
+        keyword: req.body.keyword,
+        title: req.body.title,
+        text: req.body.text,
+        date: Date.now(),
+        source: req.body.source,
+        link: req.body.link,
+        image: req.body.image,
+        owner: req.user._id,
+      });
 
-    return res.send(article);
+    res.status(200).send(article);
   } catch (error) {
-    console.log(error);
-    if (error.name === 'ValidationError') {
-      return badRequestError(error.message);
+    if (error.name === 'MongoError' && error.code === 11000) {
+      next(conflictError('Невалидные данные'));
+    } else if (error.name === 'ValidationError') {
+      next(badRequestError(error.message));
     }
-    return next(error);
+    next(error);
   }
 };
 
@@ -49,13 +52,12 @@ const deleteArticle = async (req, res, next) => {
     }
     article.deleteOne();
 
-    return res.send(article);
+    res.status(200).send(article);
   } catch (error) {
-    console.log(error);
     if (error.name === 'CastError') {
-      return badRequestError('Передан некорректный id');
+      next(badRequestError('Передан некорректный id'));
     }
-    return next(error);
+    next(error);
   }
 };
 

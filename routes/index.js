@@ -9,25 +9,40 @@ const {
   login,
 } = require('../controllers/users');
 
-/* routers.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-}); */
-
 routers.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(4),
-    name: Joi.string().required().min(2).max(30),
-  }),
+  body: Joi
+    .object()
+    .keys({
+      email: Joi
+        .string()
+        .required()
+        .email(),
+      password: Joi
+        .string()
+        .required()
+        .trim()
+        .min(4),
+      name: Joi
+        .string()
+        .required()
+        .trim()
+        .min(2)
+        .max(30),
+    }),
 }), createUser);
 
 routers.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(4),
-  }),
+  body: Joi
+    .object()
+    .keys({
+      email: Joi
+        .string()
+        .required()
+        .email(),
+      password: Joi
+        .string()
+        .required(),
+    }),
 }), login);
 
 routers.use(auth);

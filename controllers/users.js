@@ -17,13 +17,12 @@ const getCurrentUser = async (req, res, next) => {
       throw notFoundError('Нет пользователя с таким id');
     }
 
-    return res.send(user);
+    res.status(200).send(user);
   } catch (error) {
-    console.log(error);
     if (error.name === 'CastError') {
-      return badRequestError('Передан некорректный id');
+      next(badRequestError('Передан некорректный id'));
     }
-    return next(error);
+    next(error);
   }
 };
 
@@ -42,88 +41,39 @@ const createUser = async (req, res, next) => {
         });
       });
 
-    return res.send();
+    res.status(200).send();
   } catch (error) {
-    console.log(error);
-    if (error.name === 'ValidationError') {
-      return badRequestError(error.message);
+    if (error.name === 'MongoError' && error.code === 11000) {
+      next(conflictError('Невалидные данные'));
+    } else if (error.name === 'ValidationError') {
+      next(badRequestError(error.message));
     }
-    return next(error);
+    next(error);
   }
 };
 
-const login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-
-      res.send({ token });
-    })
-    .catch((error) => {
-      console.log(error);
-      return next(unauthorizedError(error.message));
-    });
-};
-
-const getUsers = async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
-    const users = await User.find({});
+    const { email, password } = req.body;
 
-    return res.send(users);
+    await User.findUserByCredentials(email, password)
+      .then((user) => {
+        const token = jwt
+          .sign(
+            { _id: user._id },
+            NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+            { expiresIn: '7d' },
+          );
+
+        res.status(200).send({ token });
+      });
   } catch (error) {
-    console.log(error);
-    return next(error);
-  }
-};
-
-const setUserInfo = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user);
-    if (!user) {
-      throw notFoundError('Нет пользователя с таким id');
-    }
-    user.name = req.body.name;
-    user.about = req.body.about;
-
-    await user.save();
-
-    return res.send(user);
-  } catch (error) {
-    console.log(error);
-    if (error.name === 'CastError') {
-      return badRequestError('Передан некорректный id');
-    }
-    return next(error);
-  }
-};
-
-const setUserAvatar = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user);
-    if (!user) {
-      throw notFoundError('Нет пользователя с таким id');
-    }
-    user.avatar = req.body.avatar;
-
-    await user.save();
-
-    return res.send(user);
-  } catch (error) {
-    console.log(error);
-    if (error.name === 'CastError') {
-      return badRequestError('Передан некорректный id');
-    }
-    return next(error);
+    next(unauthorizedError(error.message));
   }
 };
 
 module.exports = {
-  getUsers,
   getCurrentUser,
-  setUserInfo,
-  setUserAvatar,
   createUser,
   login,
 };
