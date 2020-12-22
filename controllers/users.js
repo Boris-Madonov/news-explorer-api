@@ -1,6 +1,6 @@
-const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { JWTKey } = require('../utils/config');
 const User = require('../models/user');
 const {
   badRequestError,
@@ -63,7 +63,7 @@ const login = async (req, res, next) => {
         const token = jwt
           .sign(
             { _id: user._id },
-            NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+            JWTKey,
             { expiresIn: '7d' },
           );
 
