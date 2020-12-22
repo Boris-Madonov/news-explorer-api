@@ -23,14 +23,23 @@ const createArticle = async (req, res, next) => {
         keyword: req.body.keyword,
         title: req.body.title,
         text: req.body.text,
-        date: Date.now(),
+        date: req.body.date,
         source: req.body.source,
         link: req.body.link,
         image: req.body.image,
         owner: req.user._id,
       });
 
-    res.status(200).send(article);
+    res.status(200).send({
+      _id: article._id,
+      keyword: article.keyword,
+      title: article.title,
+      text: article.text,
+      date: article.date,
+      source: article.source,
+      link: article.link,
+      image: article.image,
+    });
   } catch (error) {
     if (error.name === 'MongoError' && error.code === 11000) {
       next(conflictError('Невалидные данные'));
