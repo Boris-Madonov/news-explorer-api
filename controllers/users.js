@@ -21,8 +21,9 @@ const getCurrentUser = async (req, res, next) => {
   } catch (error) {
     if (error.name === 'CastError') {
       next(badRequestError('Передан некорректный id'));
+    } else {
+      next(error);
     }
-    next(error);
   }
 };
 
