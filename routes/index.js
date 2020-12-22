@@ -19,9 +19,7 @@ routers.post('/signup', celebrate({
         .email(),
       password: Joi
         .string()
-        .required()
-        .trim()
-        .min(4),
+        .required(),
       name: Joi
         .string()
         .required()
