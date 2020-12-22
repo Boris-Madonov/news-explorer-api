@@ -51,6 +51,7 @@ router.delete('/articles/:articleId', celebrate({
     .keys({
       articleId: Joi
         .string()
+        .hex()
         .length(24),
     }),
 }), deleteArticle);
