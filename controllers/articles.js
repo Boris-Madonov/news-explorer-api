@@ -1,6 +1,7 @@
 const Article = require('../models/article');
 const {
   badRequestError,
+  forbiddenError,
   notFoundError,
   conflictError,
 } = require('../errors/errors');
@@ -45,8 +46,9 @@ const createArticle = async (req, res, next) => {
       next(conflictError('Невалидные данные'));
     } else if (error.name === 'ValidationError') {
       next(badRequestError(error.message));
+    } else {
+      next(error);
     }
-    next(error);
   }
 };
 
@@ -57,7 +59,7 @@ const deleteArticle = async (req, res, next) => {
       throw notFoundError('Нет статьи с таким id');
     }
     if (toString(article.owner) !== toString(req.user._id)) {
-      throw notFoundError('Нет прав на удаление статьи');
+      throw forbiddenError('Нет прав на удаление статьи');
     }
     article.deleteOne();
 
@@ -65,8 +67,9 @@ const deleteArticle = async (req, res, next) => {
   } catch (error) {
     if (error.name === 'CastError') {
       next(badRequestError('Передан некорректный id'));
+    } else {
+      next(error);
     }
-    next(error);
   }
 };
 
