@@ -48,8 +48,9 @@ const createUser = async (req, res, next) => {
       next(conflictError('Невалидные данные'));
     } else if (error.name === 'ValidationError') {
       next(badRequestError(error.message));
+    } else {
+      next(error);
     }
-    next(error);
   }
 };
 
