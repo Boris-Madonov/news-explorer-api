@@ -10,8 +10,8 @@ const {
 } = process.env;
 
 const port = PORT || 3000;
-const endpoint = NODE_ENV === 'prodaction' ? API_URL : devUrl;
-const JWTKey = NODE_ENV === 'prodaction' ? JWT_SECRET : devJWT;
+const endpoint = NODE_ENV === 'production' ? API_URL : devUrl;
+const JWTKey = NODE_ENV === 'production' ? JWT_SECRET : devJWT;
 
 module.exports = {
   port,
