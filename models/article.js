@@ -10,19 +10,21 @@ const articleSchema = new Schema({
     type: String,
     required: true,
   },
-  text: {
+  description: {
     type: String,
     required: true,
   },
-  date: {
+  publishedAt: {
     type: String,
     required: true,
   },
   source: {
-    type: String,
-    required: true,
+    name: {
+      type: String,
+      required: true,
+    },
   },
-  link: {
+  url: {
     type: String,
     required: true,
     validate: {
@@ -30,7 +32,7 @@ const articleSchema = new Schema({
       message: (props) => `${props.v} ошибка в ссылке`,
     },
   },
-  image: {
+  urlToImage: {
     type: String,
     required: true,
     validate: {

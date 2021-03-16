@@ -23,11 +23,13 @@ const createArticle = async (req, res, next) => {
       .create({
         keyword: req.body.keyword,
         title: req.body.title,
-        text: req.body.text,
-        date: req.body.date,
-        source: req.body.source,
-        link: req.body.link,
-        image: req.body.image,
+        description: req.body.description,
+        publishedAt: req.body.publishedAt,
+        source: {
+          name: req.body.source.name,
+        },
+        url: req.body.url,
+        urlToImage: req.body.urlToImage,
         owner: req.user._id,
       });
 
@@ -35,11 +37,13 @@ const createArticle = async (req, res, next) => {
       _id: article._id,
       keyword: article.keyword,
       title: article.title,
-      text: article.text,
-      date: article.date,
-      source: article.source,
-      link: article.link,
-      image: article.image,
+      description: article.description,
+      publishedAt: article.publishedAt,
+      source: {
+        name: article.source.name,
+      },
+      url: article.url,
+      urlToImage: article.urlToImage,
     });
   } catch (error) {
     if (error.name === 'MongoError' && error.code === 11000) {
