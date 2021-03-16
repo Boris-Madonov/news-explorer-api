@@ -22,24 +22,26 @@ router.post('/articles', celebrate({
         .required()
         .trim()
         .min(1),
-      text: Joi
+      description: Joi
         .string()
         .required()
         .trim()
         .min(1),
-      date: Joi
+      publishedAt: Joi
         .string()
         .required(),
-      source: Joi
-        .string()
-        .required()
-        .trim()
-        .min(1),
-      link: Joi
+      source: {
+        name: Joi
+          .string()
+          .required()
+          .trim()
+          .min(1),
+      },
+      url: Joi
         .string()
         .required()
         .custom(urlValidation),
-      image: Joi
+      urlToImage: Joi
         .string()
         .required()
         .custom(urlValidation),
